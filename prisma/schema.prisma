@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Roles {
+  ADMIN
+  USER
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique @db.VarChar(80)
+  password String
+  name String @db.VarChar(30)
+  lastname String @db.VarChar(30)
+  role Roles @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id String @id @default(uuid())
+  category String @unique @db.VarChar(30)
+  products CategoriesOnProducts[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Variant {
+  id String @id @default(uuid())
+  variant String @unique @db.VarChar(10)
+  products ProductOnVariant[]
+  createdAt DateTime @unique @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id String @id @default(uuid())
+  title String @unique @db.VarChar(150)
+  description String @unique @db.Text
+  photo String @unique
+  price Int @default(0)
+  categories CategoriesOnProducts[]
+  variants ProductOnVariant[]
+  createdAt DateTime @unique @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CategoriesOnProducts {
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+
+  @@id([categoryId, productId])
+}
+
+model ProductOnVariant {
+  id String @id @default(uuid())
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  variant Variant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  variantId String
+  count Int @default(1)
+  createdAt DateTime @unique @default(now())
+  updatedAt DateTime @updatedAt
+}
