@@ -9,3 +9,7 @@ export interface Iauth {
   email: string;
   password: string;
 }
+
+export interface Itoken {
+  token: string;
+}
